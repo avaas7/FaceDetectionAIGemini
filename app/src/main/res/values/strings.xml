@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">GeminiFaceDetection</string>
+    <string name="action_go">Go</string>
+    <string name="action_check_for_acceptance">Check Image for Acceptance</string>
+    <string name="face_detection_title">Clear Face detection with Gemini</string>
+    <string name="label_prompt">Prompt</string>
+    <string name="upload_image">Upload Image</string>
+    <string name="results_placeholder">(Results will appear here)</string>
+</resources>
