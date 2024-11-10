@@ -99,7 +99,7 @@ fun FaceDetectionScreen(
         ) {
             AsyncImage(
                 model = selectedImageUri ?: placeholderImageRes,
-                contentDescription = stringResource(R.string.image1_description),
+                contentDescription = "",
                 modifier = Modifier
                     .size(400.dp)
                     .padding(16.dp)
