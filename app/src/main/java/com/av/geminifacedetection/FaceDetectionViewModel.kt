@@ -19,9 +19,47 @@ class FaceDetectionViewModel : ViewModel() {
     val uiState: StateFlow<UiState> =
         _uiState.asStateFlow()
 
+    val systemInstruction = content {
+        text("""
+        User Photo Validation Instructions:
+        
+        Criteria for Valid Photo:
+        
+        1. Single Face Detection: The photo must contain only one distinct face. Multiple faces will lead to rejection.
+        2. Eye Openness: Both eyes of the user must be fully open and clearly visible.
+        3. Minimum Face Size Requirement: The face width must occupy at least 40% of the total image width (MinFaceSize: 0.4).
+        4. Liveliness Check: The photo should show a live person and not a static image, illustration, or reprinted photo.
+        5. Clarity: The image should be clear, readable, and free of any blurriness or pixelation.
+        6. No Obstructive Accessories: The user should not wear any accessories (e.g., glasses, masks) that cover or obscure facial features.
+        7. Full Face Visibility: All key facial parts – both eyes, both ears, mouth, forehead, nose, and chin – must be clearly visible in the image.
+        
+        Output JSON Specification:
+        
+        - If the photo meets all criteria, return:
+        {
+            "resultText": "accepted",
+            "isAccepted": true
+        }
+        
+        - If the photo fails any of the criteria, return:
+        {
+            "resultText": "[Brief reason why the photo is unacceptable]",
+            "isAccepted": false
+        }
+        
+        Example Error Messages:
+        - "Multiple faces detected in the photo."
+        - "Eyes are not fully open."
+        - "Face does not meet the minimum size requirement."
+        - "Image is blurry or pixelated."
+        - "Obstructive accessories detected on the face."
+        - "Incomplete visibility of key facial features."
+    """.trimIndent())
+    }
+
     private val generativeModel = GenerativeModel(
         "gemini-1.5-flash",
-        com.av.geminifacedetection.BuildConfig.API_KEY,
+        com.av.geminifacedetection.BuildConfig.API_KEY, // Securely retrieve API key
         generationConfig = generationConfig {
             temperature = 1f
             topK = 40
@@ -29,7 +67,7 @@ class FaceDetectionViewModel : ViewModel() {
             maxOutputTokens = 8192
             responseMimeType = "text/plain"
         },
-        systemInstruction = content { text("User Photo Validation Instructions:\n\nCriteria for Valid Photo:\n\n1. Single Face Detection: The photo must contain only one distinct face. Multiple faces will lead to rejection.\n2. Eye Openness: Both eyes of the user must be fully open and clearly visible.\n3. Minimum Face Size Requirement: The face width must occupy at least 40% of the total image width (MinFaceSize: 0.4).\n4. Liveliness Check: The photo should show a live person and not a static image, illustration, or reprinted photo.\n5. Clarity: The image should be clear, readable, and free of any blurriness or pixelation.\n6. No Obstructive Accessories: The user should not wear any accessories (e.g., glasses, masks) that cover or obscure facial features.\n7. Full Face Visibility: All key facial parts – both eyes, both ears, mouth, forehead, nose, and chin – must be clearly visible in the image.\n\n\nOutput JSON Specification:\n\n - If the photo meets all criteria, return:\n{\n    \"resultText\": \"accepted\",\n    \"isAccepted\": true\n}\n\n - If the photo fails any of the criteria, return:\n{\n    \"resultText\": \"[Brief reason why the photo is unacceptable]\",\n    \"isAccepted\": false\n}\n\nExample Error Messages:\n\n- \"Multiple faces detected in the photo.\"\n- \"Eyes are not fully open.\"\n- \"Face does not meet the minimum size requirement.\"\n- \"Image is blurry or pixelated.\"\n- \"Obstructive accessories detected on the face.\"\n- \"Incomplete visibility of key facial features.\"") },
+        systemInstruction = systemInstruction // Use the defined instructions
     )
 
     fun sendPrompt(
@@ -42,6 +80,7 @@ class FaceDetectionViewModel : ViewModel() {
                 val response = generativeModel.generateContent(
                     content {
                         image(bitmap)
+                        text("")
                     }
                 )
                 response.text?.let { outputContent ->

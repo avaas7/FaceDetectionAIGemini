@@ -99,7 +99,7 @@ fun FaceDetectionScreen(
         ) {
             AsyncImage(
                 model = selectedImageUri ?: placeholderImageRes,
-                contentDescription = "",
+                contentDescription = "Selected Image",
                 modifier = Modifier
                     .size(400.dp)
                     .padding(16.dp)
@@ -131,7 +131,7 @@ fun FaceDetectionScreen(
                         }
                     } ?: run {
                         // If the selected image URI is null, show a toast
-                        Toast.makeText(context, "Please select an Image", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Select an image first", Toast.LENGTH_SHORT).show()
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
